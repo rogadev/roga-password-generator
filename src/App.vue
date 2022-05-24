@@ -56,8 +56,29 @@ const number = ref(false);
       name="number"
       v-model="number"
     />
+    <br />
+    <button
+      class="
+        bg-teal-200
+        border border-teal-300
+        shadow
+        rounded
+        mt-4
+        px-2
+        py-1
+        hover:bg-teal-300
+      "
+      @click="
+        {
+          key++;
+        }
+      "
+    >
+      Try Another
+    </button>
 
     <Password
+      :key="key"
       :length="length"
       :special="special"
       :upper="upper"
