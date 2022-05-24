@@ -64,6 +64,5 @@ const number = ref(false);
       :lower="lower"
       :number="number"
     />
-    <small>Click to copy.</small>
   </div>
 </template>

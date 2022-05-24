@@ -16,7 +16,7 @@ const copy = () => {
 
 <template>
   <div class="p-4">
-    <h1>Your password:</h1>
+    <h3>Your password: (click to copy)</h3>
     <div @click="copy" class="cursor-pointer font-bold">{{ password }}</div>
   </div>
 </template>
