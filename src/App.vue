@@ -4,10 +4,10 @@ import Password from "./components/Password.vue";
 
 const key = ref(1);
 const length = ref(12);
-const special = ref(false);
+const special = ref(true);
 const upper = ref(true);
 const lower = ref(true);
-const number = ref(false);
+const number = ref(true);
 
 function incKey() {
   key.value++;
@@ -18,7 +18,7 @@ function incKey() {
   <div class="p-8">
     <label for="length" class="pr-4">Length</label>
     <input
-      class="border rounded shadow px-2 py-1"
+      class="border rounded shadow px-2 py-1 mb-3"
       type="number"
       id="length"
       name="length"
@@ -32,7 +32,7 @@ function incKey() {
       name="special"
       v-model="special"
     />
-    <label for="special" class="pr-4">Special Characters</label>
+    <label for="special" class="pl-4">Special Characters</label>
     <br />
     <input
       class="border rounded shadow"
@@ -41,7 +41,7 @@ function incKey() {
       name="upper"
       v-model="upper"
     />
-    <label for="upper" class="pr-4">Upper Case</label>
+    <label for="upper" class="pl-4">Upper Case</label>
     <br />
     <input
       class="border rounded shadow"
@@ -50,7 +50,7 @@ function incKey() {
       name="lower"
       v-model="lower"
     />
-    <label for="lower" class="pr-4">Lower Case</label>
+    <label for="lower" class="pl-4">Lower Case</label>
     <br />
     <input
       class="border rounded shadow"
@@ -59,7 +59,7 @@ function incKey() {
       name="number"
       v-model="number"
     />
-    <label for="number" class="pr-4">Numbers</label>
+    <label for="number" class="pl-4">Numbers</label>
     <br />
     <button
       class="
