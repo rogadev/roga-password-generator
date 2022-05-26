@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import Password from "./components/Password.vue";
 
 const key = ref(1);
@@ -8,20 +8,23 @@ const special = ref(false);
 const upper = ref(true);
 const lower = ref(true);
 const number = ref(false);
+
+function incKey() {
+  key.value++;
+}
 </script>
 
 <template>
   <div class="p-8">
     <label for="length" class="pr-4">Length</label>
     <input
-      class="border rounded shadow"
+      class="border rounded shadow px-2 py-1"
       type="number"
       id="length"
       name="length"
       v-model="length"
     />
     <br />
-    <label for="special" class="pr-4">Special Characters</label>
     <input
       class="border rounded shadow"
       type="checkbox"
@@ -29,8 +32,8 @@ const number = ref(false);
       name="special"
       v-model="special"
     />
+    <label for="special" class="pr-4">Special Characters</label>
     <br />
-    <label for="upper" class="pr-4">Upper Case</label>
     <input
       class="border rounded shadow"
       type="checkbox"
@@ -38,8 +41,8 @@ const number = ref(false);
       name="upper"
       v-model="upper"
     />
+    <label for="upper" class="pr-4">Upper Case</label>
     <br />
-    <label for="lower" class="pr-4">Lower Case</label>
     <input
       class="border rounded shadow"
       type="checkbox"
@@ -47,8 +50,8 @@ const number = ref(false);
       name="lower"
       v-model="lower"
     />
+    <label for="lower" class="pr-4">Lower Case</label>
     <br />
-    <label for="number" class="pr-4">Numbers</label>
     <input
       class="border rounded shadow"
       type="checkbox"
@@ -56,6 +59,7 @@ const number = ref(false);
       name="number"
       v-model="number"
     />
+    <label for="number" class="pr-4">Numbers</label>
     <br />
     <button
       class="
@@ -68,11 +72,7 @@ const number = ref(false);
         py-1
         hover:bg-teal-300
       "
-      @click="
-        {
-          key++;
-        }
-      "
+      v-on:click="incKey"
     >
       Try Another
     </button>

@@ -14,7 +14,7 @@ const get = (length, lower, upper, number, special) => {
     num: number ? gen(48, 57) : [],
     alphaLower: lower ? gen(97, 122) : [],
     alphaUpper: upper ? gen(65, 90) : [],
-    special: special ? [...`~\`! @#$%^&*()_-+={[}]|\\:;"'<,>.?/`] : [],
+    special: special ? [...`~\`!@#$%^&*()_-+={[}]|\\:;"'<,>.?/`] : [],
   }
 
   const set = Object.values(sets).flat()
