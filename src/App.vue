@@ -9,7 +9,7 @@ const upper = ref(true);
 const lower = ref(true);
 const number = ref(true);
 
-function incKey() {
+function generateNewPassword() {
   key.value++;
 }
 </script>
@@ -72,7 +72,7 @@ function incKey() {
         py-1
         hover:bg-teal-300
       "
-      v-on:click="incKey"
+      v-on:click="generateNewPassword"
     >
       Try Another
     </button>
