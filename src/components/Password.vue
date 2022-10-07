@@ -1,5 +1,5 @@
 <script setup>
-import { defineProps, computed, ref } from "vue";
+import { computed, ref } from "vue";
 import get from "../functions/get.js";
 
 const props = defineProps(["length", "special", "upper", "lower", "number"]);
