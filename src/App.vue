@@ -44,56 +44,61 @@ function generateNewPassword() {
         >
           Roga's Password Generator
         </h1>
-        <div class="mt-4">
-          <label for="length" class="pr-4">Length</label>
-          <input
-            class="border rounded shadow px-2 py-1 mb-3"
-            type="number"
-            id="length"
-            name="length"
-            v-model="length"
-          />
-        </div>
-        <div class="mt-4 pl-14">
-          <div>
+        <div class="w-fit mx-auto">
+          <div class="mt-4 min-w-[280px] mx-auto">
+            <label for="length" class="pr-4 text-center">Length</label>
+            <!-- on click select all text -->
             <input
-              class="border rounded shadow"
-              type="checkbox"
-              id="special"
-              name="special"
-              v-model="special"
+              class="border rounded shadow px-2 py-1 mb-3"
+              type="number"
+              id="length"
+              name="length"
+              v-model="length"
+              @focus="$event.target.select()"
             />
-            <label for="special" class="pl-4">Special Characters</label>
           </div>
-          <div>
-            <input
-              class="border rounded shadow"
-              type="checkbox"
-              id="upper"
-              name="upper"
-              v-model="upper"
-            />
-            <label for="upper" class="pl-4">Upper Case</label>
-          </div>
-          <div>
-            <input
-              class="border rounded shadow"
-              type="checkbox"
-              id="lower"
-              name="lower"
-              v-model="lower"
-            />
-            <label for="lower" class="pl-4">Lower Case</label>
-          </div>
-          <div>
-            <input
-              class="border rounded shadow"
-              type="checkbox"
-              id="number"
-              name="number"
-              v-model="number"
-            />
-            <label for="number" class="pl-4">Numbers</label>
+
+          <div class="mt-4 pl-6">
+            <div>
+              <input
+                class="border rounded shadow"
+                type="checkbox"
+                id="special"
+                name="special"
+                v-model="special"
+              />
+              <label for="special" class="pl-4">Special Characters</label>
+            </div>
+            <div>
+              <input
+                class="border rounded shadow"
+                type="checkbox"
+                id="upper"
+                name="upper"
+                v-model="upper"
+              />
+              <label for="upper" class="pl-4">Upper Case</label>
+            </div>
+            <div>
+              <input
+                class="border rounded shadow"
+                type="checkbox"
+                id="lower"
+                name="lower"
+                v-model="lower"
+              />
+              <label for="lower" class="pl-4">Lower Case</label>
+            </div>
+            <div>
+              <input
+                class="border rounded shadow"
+                type="checkbox"
+                id="number"
+                name="number"
+                v-model="number"
+              />
+              <label for="number" class="pl-4">Numbers</label>
+            </div>
           </div>
         </div>
 
