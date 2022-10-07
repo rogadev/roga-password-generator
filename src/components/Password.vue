@@ -17,10 +17,10 @@ const copy = () => {
 </script>
 
 <template>
-  <div class="p-4">
-    <h3>Your password: (click to copy)</h3>
-    <div @click="copy" class="cursor-pointer font-bold">
+  <div class="mb-2 mt-8 p-2 text-center">
+    <div @click="copy" class="cursor-pointer font-bold text-xl">
       {{ copied ? "Copied!" : password }}
     </div>
+    <p class="text-xs text-gray-600 italic">click to copy</p>
   </div>
 </template>
