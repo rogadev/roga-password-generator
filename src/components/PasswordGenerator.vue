@@ -116,6 +116,7 @@ function getShareableUrl() {
  * Copies the shareable URL (containing current settings) to the clipboard.
  * Updates the shareUrlStatus ref based on the operation result.
  */
+
 async function copyShareableUrl() {
   const shareableUrl = getShareableUrl();
 
