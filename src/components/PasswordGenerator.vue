@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { getParamsFromURL, updateURLParams } from '../utils/urlParams';
+import { getParamsFromURL, updateURLParams, buildQueryString } from '../utils/urlParams';
 import { generatePassword } from '../utils/password';
 import OptionsPanel from './OptionsPanel.vue';
 import KeyboardExcluder from './KeyboardExcluder.vue';
@@ -28,6 +28,8 @@ function handleSettingsChanged(newSettings) {
   Object.assign(settings, newSettings);
   // Generate a new password with updated settings
   generateNewPassword();
+  // Update URL params to reflect current settings
+  updateURLParams(settings);
 }
 
 function handleExcludedCharsChanged(newExcludedChars) {
@@ -35,13 +37,18 @@ function handleExcludedCharsChanged(newExcludedChars) {
   settings.excludedChars = newExcludedChars;
   // Generate a new password with updated excluded chars
   generateNewPassword();
+  // Update URL params to reflect current settings
+  updateURLParams(settings);
 }
 
+/**
+ * Generates a new password based on the current settings.
+ * Updates the generatedPassword or generationError refs.
+ */
 function generateNewPassword() {
-  console.log("Generating password with settings:", JSON.stringify(settings));
   generationError.value = ''; // Clear previous error
   try {
-    // Ensure we're using latest settings for generation
+    // Use current reactive settings
     const password = generatePassword({ ...settings });
     if (password.startsWith('Error:')) {
       generationError.value = password;
@@ -58,16 +65,16 @@ function generateNewPassword() {
 
 // Function to read initial settings from URL
 function loadSettingsFromURL() {
-  console.log("Loading initial settings from URL...");
   const urlSettings = getParamsFromURL();
-  console.log("URL settings:", urlSettings);
 
   // Apply URL settings to our reactive settings object
   Object.assign(settings, urlSettings);
-
-  // No need to call generateNewPassword here as onMounted will handle it
 }
 
+/**
+ * Copies the generated password to the clipboard.
+ * Updates the copyStatus ref based on the operation result.
+ */
 async function copyPassword() {
   if (!generatedPassword.value || !navigator.clipboard) {
     copyStatus.value = 'error';
@@ -94,52 +101,22 @@ async function copyPassword() {
   }
 }
 
-// Function to get sharable URL with current settings
+/**
+ * Generates a shareable URL containing the current password settings.
+ * @returns {string} The shareable URL.
+ */
 function getShareableUrl() {
-  // Build a new URL with the current settings without updating the browser URL
   const url = new URL(window.location.href);
-
-  // Clear existing parameters
-  url.search = '';
-
-  // Add parameters for current settings
-  const params = new URLSearchParams();
-
-  if (settings.length !== 20) { // Default is 20
-    params.set('len', settings.length.toString());
-  }
-
-  if (settings.excludeLowercase) {
-    params.set('exLower', '');
-  }
-
-  if (settings.excludeNumbers) {
-    params.set('exNum', '');
-  }
-
-  if (settings.excludeUppercase) {
-    params.set('exUpper', '');
-  }
-
-  if (settings.excludeSymbols) {
-    params.set('exSym', '');
-  }
-
-  if (settings.ruleNoLeadingSpecial) {
-    params.set('ruleNoLead', '');
-  }
-
-  if (settings.excludedChars) {
-    params.set('exc', encodeURIComponent(settings.excludedChars));
-  }
-
-  // Set the search portion of the URL
-  url.search = params.toString();
-
+  const paramsString = buildQueryString(settings);
+  url.search = paramsString;
   return url.href;
 }
 
-// Function to copy shareable URL to clipboard
+/**
+ * Copies the shareable URL (containing current settings) to the clipboard.
+ * Updates the shareUrlStatus ref based on the operation result.
+ */
+
 async function copyShareableUrl() {
   const shareableUrl = getShareableUrl();
 
@@ -223,7 +200,7 @@ onMounted(() => {
         <div v-if="generatedPassword && !generationError"
           class="absolute top-1/2 right-3 transform -translate-y-1/2 flex items-center space-x-2">
           <!-- Generate New Password Button -->
-          <button @click="generateNewPassword"
+          <button @click="generateNewPassword()"
             class="p-2.5 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 group text-slate-500 hover:bg-slate-100 hover:text-indigo-600"
             aria-label="Generate new password">
             <!-- Tooltip -->

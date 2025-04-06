@@ -13,6 +13,11 @@ let originalXHRSend = null;
 let requestCounter = 0;
 
 // --- Network Test --- //
+/**
+ * Runs a simple network latency test by sending a HEAD request to Google.
+ * Updates the test status and latency refs.
+ * Logs the test attempt, result, or error to the request log.
+ */
 async function runNetworkTest() {
   testStatus.value = 'testing';
   latency.value = null;
@@ -31,7 +36,6 @@ async function runNetworkTest() {
     };
 
     requestLog.value.unshift(logEntry);
-    console.log(`[Network Monitor] Test request to: HEAD ${testUrl}`);
 
     // Use 'no-cors' to ping an external resource
     await fetch(testUrl, {
@@ -73,6 +77,10 @@ async function runNetworkTest() {
 }
 
 // --- Request Interception --- //
+/**
+ * Starts intercepting global fetch and XMLHttpRequest calls.
+ * Wraps the native functions to log requests.
+ */
 function startIntercepting() {
   // --- Fetch Interception ---
   if (window.fetch && !originalFetch.value) { // Check if already wrapped
@@ -83,7 +91,6 @@ function startIntercepting() {
       requestCounter++;
       const logEntry = { id: requestCounter, type: 'fetch', method, url: String(url), timestamp: new Date() };
       requestLog.value.unshift(logEntry);
-      console.log(`[Network Monitor] Intercepted fetch: ${method} ${url}`);
       // Limit log size
       if (requestLog.value.length > 50) {
         requestLog.value.pop();
@@ -100,10 +107,10 @@ function startIntercepting() {
     originalXHRSend = window.XMLHttpRequest.prototype.send;
 
     window.XMLHttpRequest.prototype.open = function (method, url, ...rest) {
-      // Store method and url on the instance for retrieval in send wrapper
+      // Store method and url on the instance for retrieval in send wrapper,
+      // as the send function doesn't have direct access to these arguments.
       this._requestMethod = method;
       this._requestURL = url;
-      // console.log(`[Network Monitor] XHR open called: ${method} ${url}`);
       return originalXHROpen.apply(this, [method, url, ...rest]);
     };
 
@@ -118,7 +125,6 @@ function startIntercepting() {
           timestamp: new Date()
         };
         requestLog.value.unshift(logEntry);
-        console.log(`[Network Monitor] Intercepted XHR send: ${logEntry.method} ${logEntry.url}`);
         if (requestLog.value.length > 50) {
           requestLog.value.pop();
         }
@@ -133,6 +139,10 @@ function startIntercepting() {
   }
 }
 
+/**
+ * Stops intercepting network requests and restores the original
+ * global fetch and XMLHttpRequest functions.
+ */
 function stopIntercepting() {
   // --- Fetch Restoration ---
   if (originalFetch.value) {
@@ -203,7 +213,7 @@ onUnmounted(() => {
               </svg>
               Testing...
             </span>
-            <span v-else>Ping Google (HEAD)</span>
+            <span v-else>Ping Google</span>
           </button>
           <div v-if="testStatus === 'success'" class="text-sm text-green-700 bg-green-50 px-3 py-1.5 rounded-lg"
             aria-live="polite">
