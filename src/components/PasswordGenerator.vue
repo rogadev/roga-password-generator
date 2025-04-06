@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue';
-import { getParamsFromURL } from '../utils/urlParams';
+import { getParamsFromURL, updateURLParams } from '../utils/urlParams';
 import { generatePassword } from '../utils/password';
 import OptionsPanel from './OptionsPanel.vue';
 import KeyboardExcluder from './KeyboardExcluder.vue';
@@ -20,6 +20,7 @@ const settings = reactive({
 const generatedPassword = ref('');
 const generationError = ref(''); // To display errors from generatePassword
 const copyStatus = ref('idle'); // idle, copying, success, error
+const shareUrlStatus = ref('idle'); // idle, copying, success, error
 
 // --- Logic ---
 function handleSettingsChanged(newSettings) {
@@ -93,6 +94,82 @@ async function copyPassword() {
   }
 }
 
+// Function to get sharable URL with current settings
+function getShareableUrl() {
+  // Build a new URL with the current settings without updating the browser URL
+  const url = new URL(window.location.href);
+
+  // Clear existing parameters
+  url.search = '';
+
+  // Add parameters for current settings
+  const params = new URLSearchParams();
+
+  if (settings.length !== 20) { // Default is 20
+    params.set('len', settings.length.toString());
+  }
+
+  if (settings.excludeLowercase) {
+    params.set('exLower', '');
+  }
+
+  if (settings.excludeNumbers) {
+    params.set('exNum', '');
+  }
+
+  if (settings.excludeUppercase) {
+    params.set('exUpper', '');
+  }
+
+  if (settings.excludeSymbols) {
+    params.set('exSym', '');
+  }
+
+  if (settings.ruleNoLeadingSpecial) {
+    params.set('ruleNoLead', '');
+  }
+
+  if (settings.excludedChars) {
+    params.set('exc', encodeURIComponent(settings.excludedChars));
+  }
+
+  // Set the search portion of the URL
+  url.search = params.toString();
+
+  return url.href;
+}
+
+// Function to copy shareable URL to clipboard
+async function copyShareableUrl() {
+  const shareableUrl = getShareableUrl();
+
+  if (!navigator.clipboard) {
+    shareUrlStatus.value = 'error';
+    return;
+  }
+
+  shareUrlStatus.value = 'copying';
+  try {
+    await navigator.clipboard.writeText(shareableUrl);
+    shareUrlStatus.value = 'success';
+
+    // Reset status after a short delay
+    setTimeout(() => {
+      if (shareUrlStatus.value === 'success') {
+        shareUrlStatus.value = 'idle';
+      }
+    }, 1500);
+  } catch (err) {
+    console.error('Failed to copy URL: ', err);
+    shareUrlStatus.value = 'error';
+    setTimeout(() => {
+      if (shareUrlStatus.value === 'error') {
+        shareUrlStatus.value = 'idle';
+      }
+    }, 2000);
+  }
+}
+
 // --- Lifecycle ---
 onMounted(() => {
   // First, load settings from URL if present
@@ -125,10 +202,14 @@ onMounted(() => {
 
       <!-- Password Display Area -->
       <div class="mb-8 relative">
-        <div v-if="generatedPassword"
-          class="p-5 pr-28 bg-gradient-to-r from-slate-100 to-white rounded-xl font-mono text-base sm:text-lg break-all text-center shadow-inner text-slate-800 border border-slate-200"
+        <div v-if="generatedPassword" @click="copyPassword"
+          class="p-5 pr-28 bg-gradient-to-r from-slate-100 to-white rounded-xl font-mono text-base sm:text-lg break-all text-center shadow-inner text-slate-800 border border-slate-200 cursor-pointer hover:bg-slate-50 transition-colors duration-200"
           aria-live="polite">
           {{ generatedPassword }}
+          <div v-if="copyStatus === 'success'"
+            class="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl">
+            <span class="text-green-600 font-medium text-base sm:text-lg">Copied to clipboard!</span>
+          </div>
         </div>
 
         <!-- Error Display -->
@@ -157,31 +238,34 @@ onMounted(() => {
             </svg>
           </button>
 
-          <!-- Copy Button -->
-          <button @click="copyPassword" :disabled="copyStatus === 'copying' || copyStatus === 'success'"
-            class="p-2.5 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-purple-500 group"
+          <!-- Share URL Button -->
+          <button @click.stop="copyShareableUrl"
+            class="p-2.5 rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 group"
             :class="{
-              'text-slate-500 hover:bg-slate-100 hover:text-purple-600': copyStatus === 'idle',
-              'text-green-600 bg-green-50 scale-110': copyStatus === 'success',
-              'text-red-600 bg-red-50': copyStatus === 'error',
-              'text-slate-400 cursor-default': copyStatus === 'copying'
-            }" aria-label="Copy password to clipboard">
+              'text-slate-500 hover:bg-slate-100 hover:text-indigo-600': shareUrlStatus === 'idle',
+              'text-green-600 bg-green-50 scale-110': shareUrlStatus === 'success',
+              'text-red-600 bg-red-50': shareUrlStatus === 'error',
+              'text-slate-400 cursor-default': shareUrlStatus === 'copying'
+            }" aria-label="Copy shareable URL">
             <!-- Tooltip -->
             <span
               class="absolute bottom-full right-0 mb-2 hidden group-hover:block group-focus:block bg-slate-800 text-white text-xs rounded-lg py-1.5 px-3 z-10 whitespace-nowrap"
-              v-if="copyStatus === 'idle' || copyStatus === 'error'">
-              {{ copyStatus === 'error' ? 'Failed to copy' : 'Copy to clipboard' }}
+              v-if="shareUrlStatus === 'idle' || shareUrlStatus === 'error'">
+              {{ shareUrlStatus === 'error' ? 'Failed to copy URL' : 'Copy shareable URL' }}
             </span>
-            <span v-if="copyStatus === 'success'" aria-live="polite" class="text-sm font-medium">Copied!</span>
+            <span v-if="shareUrlStatus === 'success'" aria-live="polite" class="text-sm font-medium">URL Copied!</span>
             <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 sm:h-6 sm:w-6" fill="none" viewBox="0 0 24 24"
               stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round"
-                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
           </button>
         </div>
         <p v-if="copyStatus === 'error'" class="text-xs text-red-600 mt-1 text-right" aria-live="assertive">
           Failed to copy!
+        </p>
+        <p v-if="shareUrlStatus === 'error'" class="text-xs text-red-600 mt-1 text-right" aria-live="assertive">
+          Failed to copy URL!
         </p>
       </div>
 
@@ -200,11 +284,6 @@ onMounted(() => {
       <!-- Network Monitor Integration -->
       <div class="mt-10 sm:mt-12">
         <NetworkMonitor />
-      </div>
-
-      <!-- Footer/Made with -->
-      <div class="mt-10 sm:mt-12 text-center text-slate-500 text-sm">
-        <p class="font-medium">Built with Vue.js & Tailwind CSS</p>
       </div>
 
     </div>
