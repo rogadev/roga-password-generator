@@ -34,12 +34,12 @@ function shuffleArray(array) {
  * Generates a password based on the provided settings.
  * @param {object} options
  * @param {number} options.length - The desired password length.
- * @param {boolean} options.excludeLowercase - Whether to exclude lowercase letters.
- * @param {boolean} options.excludeUppercase - Whether to exclude uppercase letters.
- * @param {boolean} options.excludeNumbers - Whether to exclude numbers.
- * @param {boolean} options.excludeSymbols - Whether to exclude symbols.
- * @param {string} options.excludedChars - A string of characters to exclude.
- * @param {boolean} options.ruleNoLeadingSpecial - Disallow numbers/symbols as the first character.
+ * @param {boolean} [options.excludeLowercase=false] - Whether to exclude lowercase letters.
+ * @param {boolean} [options.excludeUppercase=false] - Whether to exclude uppercase letters.
+ * @param {boolean} [options.excludeNumbers=false] - Whether to exclude numbers.
+ * @param {boolean} [options.excludeSymbols=false] - Whether to exclude symbols.
+ * @param {string} [options.excludedChars=''] - A string of specific characters to exclude.
+ * @param {boolean} [options.ruleNoLeadingSpecial=false] - Disallow numbers/symbols as the first character.
  * @returns {string} The generated password or an error message.
  */
 export function generatePassword(options) {
@@ -137,8 +137,3 @@ export function generatePassword(options) {
 
   return password.join('');
 }
-
-// Example Usage:
-// console.log(generatePassword({ length: 16, useUppercase: true, useNumbers: true, useSymbols: true, excludedChars: 'oO01lI', ruleNoLeadingSpecial: true }));
-// console.log(generatePassword({ length: 5, useNumbers: true, useSymbols: true, ruleNoLeadingSpecial: true }));
-// console.log(generatePassword({ length: 5, useNumbers: true, excludedChars: '0123456789' }));

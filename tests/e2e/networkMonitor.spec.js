@@ -25,7 +25,7 @@ test('Network monitoring shows network activity when pinging Google', async ({ p
   }
 
   // Click the "Ping Google" button
-  await page.click('button:has-text("Ping Google (HEAD)")');
+  await page.click('button:has-text("Ping Google")');
 
   // Wait for test to complete - either success or error message should appear
   await Promise.race([

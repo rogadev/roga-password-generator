@@ -12,8 +12,8 @@ const props = defineProps({
 // Emits: Notify the parent about changes
 const emit = defineEmits(['update:modelValue']);
 
-// Use computed properties with getters/setters for v-model binding
-// This avoids directly mutating the prop
+// Computed property managing the settings object.
+// Using get/set ensures the prop isn't mutated directly and emits updates.
 const localSettings = computed({
   get: () => props.modelValue,
   set: (value) => {
@@ -21,64 +21,49 @@ const localSettings = computed({
   },
 });
 
-// Helper function to emit changes
-const updateSettings = (newSettings) => {
-  // Emit the model update to trigger password regeneration
-  emit('update:modelValue', newSettings);
-};
-
-// Helper computed properties for individual settings for cleaner v-model usage
+// Helper computed properties for individual settings for cleaner v-model usage in the template.
+// Setters update the localSettings computed property, which triggers the emit.
 const length = computed({
   get: () => localSettings.value.length,
   set: (val) => {
-    const newSettings = { ...localSettings.value, length: parseInt(val) || 1 };
-    // No immediate emit here, as we'll handle this in the range input's change event
-    localSettings.value = newSettings;
+    // Ensure length is a positive integer
+    const newLength = parseInt(val) || 1;
+    localSettings.value = { ...localSettings.value, length: newLength };
   },
 });
 
 const excludeLowercase = computed({
   get: () => localSettings.value.excludeLowercase,
   set: (val) => {
-    const newSettings = { ...localSettings.value, excludeLowercase: val };
-    localSettings.value = newSettings;
-    updateSettings(newSettings); // Force immediate update
+    localSettings.value = { ...localSettings.value, excludeLowercase: val };
   },
 });
 
 const excludeNumbers = computed({
   get: () => localSettings.value.excludeNumbers,
   set: (val) => {
-    const newSettings = { ...localSettings.value, excludeNumbers: val };
-    localSettings.value = newSettings;
-    updateSettings(newSettings); // Force immediate update
+    localSettings.value = { ...localSettings.value, excludeNumbers: val };
   },
 });
 
 const excludeUppercase = computed({
   get: () => localSettings.value.excludeUppercase,
   set: (val) => {
-    const newSettings = { ...localSettings.value, excludeUppercase: val };
-    localSettings.value = newSettings;
-    updateSettings(newSettings); // Force immediate update
+    localSettings.value = { ...localSettings.value, excludeUppercase: val };
   },
 });
 
 const excludeSymbols = computed({
   get: () => localSettings.value.excludeSymbols,
   set: (val) => {
-    const newSettings = { ...localSettings.value, excludeSymbols: val };
-    localSettings.value = newSettings;
-    updateSettings(newSettings); // Force immediate update
+    localSettings.value = { ...localSettings.value, excludeSymbols: val };
   },
 });
 
 const ruleNoLeadingSpecial = computed({
   get: () => localSettings.value.ruleNoLeadingSpecial,
   set: (val) => {
-    const newSettings = { ...localSettings.value, ruleNoLeadingSpecial: val };
-    localSettings.value = newSettings;
-    updateSettings(newSettings); // Force immediate update
+    localSettings.value = { ...localSettings.value, ruleNoLeadingSpecial: val };
   },
 });
 
@@ -91,12 +76,11 @@ const ruleNoLeadingSpecial = computed({
       <label for="length-range" class="text-slate-700 font-medium mb-3 sm:mb-0 sm:mr-5 shrink-0 text-base">Password
         Length:</label>
       <div class="flex items-center space-x-4">
-        <input type="range" id="length-range" min="6" max="64" v-model="length" @input="length = $event.target.value"
-          @change="updateSettings(localSettings.value)"
+        <input type="range" id="length-range" min="6" max="64" v-model.number="length"
+          @input="length = $event.target.value"
           class="w-full sm:w-48 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
           aria-labelledby="length-label">
-        <input type="number" id="length-number" min="6" max="64" v-model="length"
-          @change="updateSettings(localSettings.value)"
+        <input type="number" id="length-number" min="6" max="64" v-model.number="length"
           class="w-16 px-2 py-1.5 border border-slate-300 rounded-lg text-center focus:ring-indigo-500 focus:border-indigo-500 focus:outline-none"
           @focus="$event.target.select()" aria-label="Password length number input">
       </div>

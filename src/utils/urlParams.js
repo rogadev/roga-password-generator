@@ -65,17 +65,12 @@ export function getParamsFromURL() {
 }
 
 /**
- * Updates the URL query string with the given password settings
- * without reloading the page.
+ * Builds a URL query string from the given settings object,
+ * only including parameters that differ from the defaults.
  * @param {object} settings - The password settings object.
+ * @returns {string} The generated query string.
  */
-export function updateURLParams(settings) {
-  // Check if running in browser environment
-  if (typeof window === 'undefined') {
-    console.warn('updateURLParams called in non-browser environment');
-    return;
-  }
-  
+export function buildQueryString(settings) {
   const params = new URLSearchParams();
 
   // Add parameters only if they differ from defaults or are boolean flags meant to be present
@@ -100,18 +95,33 @@ export function updateURLParams(settings) {
     params.set(PARAM_KEYS.ruleNoLeadingSpecial, '');
   }
 
+  // Only include excludedChars if it's not empty (default)
   if (settings.excludedChars && settings.excludedChars !== DEFAULTS.excludedChars) {
      params.set(PARAM_KEYS.excludedChars, encodeURIComponent(settings.excludedChars));
   }
 
-  const newQueryString = params.toString();
+  return params.toString();
+}
+
+/**
+ * Updates the URL query string with the given password settings
+ * without reloading the page.
+ * @param {object} settings - The password settings object.
+ */
+export function updateURLParams(settings) {
+  // Check if running in browser environment
+  if (typeof window === 'undefined') {
+    console.warn('updateURLParams called in non-browser environment');
+    return;
+  }
+  
+  const newQueryString = buildQueryString(settings);
+
   // Use replaceState to avoid polluting browser history excessively during option changes
   const newUrl = newQueryString
     ? `${window.location.pathname}?${newQueryString}`
     : window.location.pathname; // Remove query string if all options are default
 
-  console.log("Updating URL to:", newUrl);
-  
   try {
     window.history.replaceState({}, '', newUrl);
   } catch (e) {
@@ -122,9 +132,3 @@ export function updateURLParams(settings) {
     }
   }
 }
-
-// Example usage (for testing in console):
-// const currentSettings = getParamsFromURL();
-// console.log("Initial Settings:", currentSettings);
-// updateURLParams({ ...currentSettings, length: 20, useSymbols: false, excludedChars: '!@$' });
-// console.log("URL Updated. New Settings:", getParamsFromURL());

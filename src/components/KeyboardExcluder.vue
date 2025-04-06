@@ -37,8 +37,6 @@ function toggleExclude(char) {
   // Update the excluded chars string
   const newExcluded = Array.from(currentSet).join('');
 
-  console.log("Excluding characters:", newExcluded);
-
   // Emit the updated value - this will trigger password regeneration in parent
   emit('update:modelValue', newExcluded);
 }
